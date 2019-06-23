@@ -15,6 +15,7 @@ router.post('/', function(req, res, next) {
   switch (msg) {
     case 'Y':
     // add player FN to game yes array
+    // retrieveAuthor()
     case 'M':
     // add player FN to game maybe array
     case 'N':
