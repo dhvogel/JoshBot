@@ -1,8 +1,9 @@
 const chai = require('chai');
-const message = require('../../routes/message');
+const handler = require('../../routes/message/handler');
 const games = require('../../testdata/games');
 const {Datastore} = require('@google-cloud/datastore');
 const datastore = new Datastore();
+require('date');
 
 chai.should();
 
@@ -57,7 +58,6 @@ describe('Message Unit Tests', function() {
       const keys = [gameKey1, gameKey2, gameKey3];
 
       const result = await datastore.get(keys);
-      console.log(`RESULT ${JSON.stringify(result, null, 4)}`);
     }
     query();
   });
@@ -68,8 +68,28 @@ describe('Message Unit Tests', function() {
     // Upload a game object heppning in the past
   });
 
-  it('should add a team member to the yes array of the next game', () => {
+  it('should add a team member to the yes array of the next game', async () => {
+    // set currentDate
     // retrive next game object from local cloud datastore
-    //
+    // add author to yes array for that game
+    const req = {
+      body: {
+        created_at: 1561271893,
+        name: 'Daniel Vogel',
+        sender_type: 'user',
+        text: 'Y',
+      },
+    };
+
+    // validate state of db
+    const before = await datastore.get(datastore.key(['Game', 2]))
+        .then((result) => result);
+    before[0].attendance.yes.length.should.equal(0);
+
+    handler.msgHandler(req);
+
+    const after = await datastore.get(datastore.key(['Game', 2]))
+        .then((result) => result);
+    after[0].attendance.yes.length.should.equal(1);
   });
 });
