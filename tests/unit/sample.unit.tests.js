@@ -1,4 +1,5 @@
 const chai = require('chai');
+const msgHandler = require('../../routes/message/handler');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
 
@@ -19,6 +20,37 @@ describe('Sample Unit Tests', function() {
     const cb = sinon.spy();
     hello('foo', cb);
     cb.should.have.been.calledWith('hello foo');
+  });
+
+  it('should add a player name to the yes array', () => {
+    const game = {
+      attendance: {
+        yes: [],
+        maybe: [],
+        no: [],
+      },
+    };
+
+    const updatedGame = msgHandler.handleRSVP(game, 'Y', 'Dan');
+
+    updatedGame.attendance.yes.length.should.equal(1);
+    updatedGame.attendance.yes[0].should.equal('Dan');
+  });
+
+  it('remove a player from the maybe array and add to the yes array', () => {
+    const game = {
+      attendance: {
+        yes: [],
+        maybe: [],
+        no: ['Kayla'],
+      },
+    };
+
+    const updatedGame = msgHandler.handleRSVP(game, 'M', 'Kayla');
+
+    updatedGame.attendance.maybe.length.should.equal(1);
+    updatedGame.attendance.no.length.should.equal(0);
+    updatedGame.attendance.maybe[0].should.equal('Kayla');
   });
 
   // handling should be done in three parts

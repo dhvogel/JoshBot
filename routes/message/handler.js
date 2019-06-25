@@ -28,26 +28,14 @@ module.exports.msgHandler = async function(req, res, next) {
     return;
   }
 
+  if (msg === 'Y' || msg === 'M' || msg === 'N') {
+    const updatedNextGame = handleRSVP(nextGame, msg, name);
+    await datastore.save(updatedNextGame);
+    res.sendStatus(204);
+    return;
+  }
+
   switch (msg) {
-    case 'Y':
-    // add player FN to game yes array
-    // retrieveAuthor()
-      removePlayerFromRSVP(nextGame.attendance, name);
-      nextGame.attendance.yes.push(name);
-      await datastore.save(nextGame);
-      res.sendStatus(204);
-    case 'M':
-    // add player FN to game maybe array
-      removePlayerFromRSVP(nextGame.attendance, name);
-      nextGame.attendance.maybe.push(name);
-      await datastore.save(nextGame);
-      res.sendStatus(204);
-    case 'N':
-    // add player FN to game no array
-      removePlayerFromRSVP(nextGame.attendance, name);
-      nextGame.attendance.no.push(name);
-      await datastore.save(nextGame);
-      res.sendStatus(204);
     case 'JOSHBOT COMPLIMENT':
     // default: give a compliment to the msg author
     // optional: pass a name as a third argument, if passed, give the compliment
@@ -58,13 +46,35 @@ module.exports.msgHandler = async function(req, res, next) {
     // game
     case 'JOSHBOT LINEUP':
     // yields game object
+    sendGameToGroup(nextGame);
   }
 
   return;
 };
 
-function removePlayerFromRSVP(att, n) {
-  const idx = att.yes.indexOf(n);
+const sendGameToGroup = (game) => {
+  
+}
+
+const handleRSVP = (game, msg, name) => {
+  game.attendance = removePlayerFromRSVP(game.attendance, name);
+  switch (msg) {
+    case 'Y':
+      game.attendance.yes.push(name);
+      break;
+    case 'M':
+      game.attendance.maybe.push(name);
+      break;
+    case 'N':
+      game.attendance.no.push(name);
+      break;
+  }
+  return game;
+};
+
+const removePlayerFromRSVP = (att, n) => {
+  let idx;
+  idx = att.yes.indexOf(n);
   if (idx > -1) {
     att.yes.splice(idx, 1);
   }
@@ -78,5 +88,10 @@ function removePlayerFromRSVP(att, n) {
   if (idx > -1) {
     att.no.splice(idx, 1);
   }
-}
 
+  return att;
+};
+
+module.exports = {
+  handleRSVP: handleRSVP,
+};

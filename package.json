@@ -13,7 +13,8 @@
     "debug": "2.6.9",
     "express": "4.16.1",
     "@google-cloud/datastore": "4.1.2",
-    "morgan": "1.9.1"
+    "morgan": "1.9.1",
+    "node-groupme": "0.5.8",
   },
   "devDependencies": {
     "chai": "4.2.0",
