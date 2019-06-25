@@ -20,4 +20,14 @@ describe('Sample Unit Tests', function() {
     hello('foo', cb);
     cb.should.have.been.calledWith('hello foo');
   });
+
+  // handling should be done in three parts
+  // 1. request validation (do certain fields exist)?
+  // 2. business logic -- do the thing, modify the next game object
+  // 3. save the new game object
+
+  // stub db call - return game object that is "most recent"
+  // pass object to handling function Y/N/M/JOSHBOT ...
+  // assert on object returned by handling function
+
 });
