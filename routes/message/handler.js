@@ -32,16 +32,19 @@ module.exports.msgHandler = async function(req, res, next) {
     case 'Y':
     // add player FN to game yes array
     // retrieveAuthor()
+      removePlayerFromRSVP(nextGame.attendance, name);
       nextGame.attendance.yes.push(name);
       await datastore.save(nextGame);
       res.sendStatus(204);
     case 'M':
     // add player FN to game maybe array
+      removePlayerFromRSVP(nextGame.attendance, name);
       nextGame.attendance.maybe.push(name);
       await datastore.save(nextGame);
       res.sendStatus(204);
     case 'N':
     // add player FN to game no array
+      removePlayerFromRSVP(nextGame.attendance, name);
       nextGame.attendance.no.push(name);
       await datastore.save(nextGame);
       res.sendStatus(204);
@@ -58,3 +61,20 @@ module.exports.msgHandler = async function(req, res, next) {
 
   return;
 };
+
+function removePlayerFromRSVP(att, n) {
+  const idx = att.yes.indexOf(n);
+  if (idx > -1) {
+    att.yes.splice(idx, 1);
+  }
+
+  idx = att.maybe.indexOf(n);
+  if (idx > -1) {
+    att.maybe.splice(idx, 1);
+  }
+
+  idx = att.no.indexOf(n);
+  if (idx > -1) {
+    att.no.splice(idx, 1);
+  }
+}
