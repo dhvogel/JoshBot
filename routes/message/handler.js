@@ -31,7 +31,7 @@ module.exports.msgHandler = async function(req, res, next) {
   }
 
   if (msg === 'Y' || msg === 'M' || msg === 'N') {
-    nextGame.attendance = removePlayerFromRSVP(nextGame.attendance, name);
+    nextGame.attendance = removeRSVP(nextGame.attendance, name);
     const updatedNextGame = addRSVP(nextGame, msg, name);
     await datastore.save(updatedNextGame);
     res.sendStatus(204);
@@ -62,7 +62,7 @@ const sendGameToGroup = (game) => {
       JSON.stringify(game, null, 4), {picture_url: null}, () => {});
 };
 
-const handleRSVP = (game, msg, name) => {
+const addRSVP = (game, msg, name) => {
   switch (msg) {
     case 'Y':
       game.attendance.yes.push(name);
@@ -77,7 +77,7 @@ const handleRSVP = (game, msg, name) => {
   return game;
 };
 
-const addRSVP = (att, n) => {
+const removeRSVP = (att, n) => {
   let idx;
   idx = att.yes.indexOf(n);
   if (idx > -1) {
@@ -107,6 +107,6 @@ const retrieveGroupmeCreds = () => {
 };
 
 module.exports = {
-  handleRSVP: handleRSVP,
+  addRSVP: addRSVP,
   sendGameToGroup: sendGameToGroup,
 };

@@ -33,29 +33,13 @@ describe('Sample Unit Tests', function() {
       },
     };
 
-    const updatedGame = msgHandler.handleRSVP(game, 'Y', 'Dan');
+    const updatedGame = msgHandler.addRSVP(game, 'Y', 'Kayla');
 
     updatedGame.attendance.yes.length.should.equal(1);
-    updatedGame.attendance.yes[0].should.equal('Dan');
+    updatedGame.attendance.yes[0].should.equal('Kayla');
   });
 
-  it('should remove player from the maybe array, add to the yes array', () => {
-    const game = {
-      attendance: {
-        yes: [],
-        maybe: [],
-        no: ['Kayla'],
-      },
-    };
-
-    const updatedGame = msgHandler.handleRSVP(game, 'M', 'Kayla');
-
-    updatedGame.attendance.maybe.length.should.equal(1);
-    updatedGame.attendance.no.length.should.equal(0);
-    updatedGame.attendance.maybe[0].should.equal('Kayla');
-  });
-
-  it.only('should send game object to groupme', () => {
+  it('should send game object to groupme', () => {
     const game = {
       time: '2019-06-20T20:00:00+00:00',
       id: '1',
