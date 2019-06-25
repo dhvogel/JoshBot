@@ -51,7 +51,8 @@ module.exports.msgHandler = async function(req, res, next) {
     case 'JOSHBOT COMPLIMENT':
     // default: give a compliment to the msg author
     // optional: pass a name as a third argument, if passed, give the compliment
-    // to the passed name
+    // to the passed name.
+    // Note: for the bottom three, need to programatically post back to groupme
     case 'JOSHBOT KEEPERS':
     // yields an array of four random players who are RSVP'd yes to the next
     // game
@@ -78,3 +79,4 @@ function removePlayerFromRSVP(att, n) {
     att.no.splice(idx, 1);
   }
 }
+
