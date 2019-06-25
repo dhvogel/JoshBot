@@ -1,4 +1,7 @@
-module.exports.msgHandler = function(req, res, next) {
+const {Datastore} = require('@google-cloud/datastore');
+const datastore = new Datastore();
+
+module.exports.msgHandler = async function(req, res, next) {
   if (!req.body.text) return;
 
   const msg = req.body.text.trim().toUpperCase();
@@ -8,14 +11,40 @@ module.exports.msgHandler = function(req, res, next) {
     return;
   }
 
+  const createdUnixTimestamp = req.body.created_at;
+  const createdDate = new Date(createdUnixTimestamp*1000);
+
+  const query = datastore.createQuery('Game')
+      .filter('time', '>', createdDate.toISOString())
+      .order('time')
+      .limit(1);
+
+  const [[nextGame]] = await datastore.runQuery(query);
+
+  const name = req.body.name;
+
+  if (!createdUnixTimestamp || !name) {
+    console.log('either createdUnixTimestamp or name not present');
+    return;
+  }
+
   switch (msg) {
     case 'Y':
     // add player FN to game yes array
     // retrieveAuthor()
+      nextGame.attendance.yes.push(name);
+      await datastore.save(nextGame);
+      res.sendStatus(204);
     case 'M':
     // add player FN to game maybe array
+      nextGame.attendance.maybe.push(name);
+      await datastore.save(nextGame);
+      res.sendStatus(204);
     case 'N':
     // add player FN to game no array
+      nextGame.attendance.no.push(name);
+      await datastore.save(nextGame);
+      res.sendStatus(204);
     case 'JOSHBOT COMPLIMENT':
     // default: give a compliment to the msg author
     // optional: pass a name as a third argument, if passed, give the compliment
@@ -24,7 +53,8 @@ module.exports.msgHandler = function(req, res, next) {
     // yields an array of four random players who are RSVP'd yes to the next
     // game
     case 'JOSHBOT LINEUP':
-    // return game object
+    // yields game object
   }
+
   return;
 };
