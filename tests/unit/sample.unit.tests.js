@@ -30,4 +30,8 @@ describe('Sample Unit Tests', function() {
   // pass object to handling function Y/N/M/JOSHBOT ...
   // assert on object returned by handling function
 
+  // also, rename things to be:
+  // message.js
+  // handlers/
+  //   message.js
 });
