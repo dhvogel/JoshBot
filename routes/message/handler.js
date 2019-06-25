@@ -1,5 +1,7 @@
 const {Datastore} = require('@google-cloud/datastore');
 const datastore = new Datastore();
+const groupme = require('groupme').Stateless;
+const groupmeConfig = require('../../config/groupme');
 
 module.exports.msgHandler = async function(req, res, next) {
   if (!req.body.text) return;
@@ -29,7 +31,8 @@ module.exports.msgHandler = async function(req, res, next) {
   }
 
   if (msg === 'Y' || msg === 'M' || msg === 'N') {
-    const updatedNextGame = handleRSVP(nextGame, msg, name);
+    nextGame.attendance = removePlayerFromRSVP(nextGame.attendance, name);
+    const updatedNextGame = addRSVP(nextGame, msg, name);
     await datastore.save(updatedNextGame);
     res.sendStatus(204);
     return;
@@ -44,20 +47,22 @@ module.exports.msgHandler = async function(req, res, next) {
     case 'JOSHBOT KEEPERS':
     // yields an array of four random players who are RSVP'd yes to the next
     // game
-    case 'JOSHBOT LINEUP':
+    case 'JOSHBOT GAME':
     // yields game object
-    sendGameToGroup(nextGame);
+      sendGameToGroup(nextGame);
   }
 
   return;
 };
 
 const sendGameToGroup = (game) => {
-  
-}
+  const groupmeCreds = retrieveGroupmeCreds();
+  groupme.Bots.post(groupmeCreds.access_token,
+      groupmeCreds.bot_id,
+      JSON.stringify(game, null, 4), {picture_url: null}, () => {});
+};
 
 const handleRSVP = (game, msg, name) => {
-  game.attendance = removePlayerFromRSVP(game.attendance, name);
   switch (msg) {
     case 'Y':
       game.attendance.yes.push(name);
@@ -72,7 +77,7 @@ const handleRSVP = (game, msg, name) => {
   return game;
 };
 
-const removePlayerFromRSVP = (att, n) => {
+const addRSVP = (att, n) => {
   let idx;
   idx = att.yes.indexOf(n);
   if (idx > -1) {
@@ -92,6 +97,16 @@ const removePlayerFromRSVP = (att, n) => {
   return att;
 };
 
+const retrieveGroupmeCreds = () => {
+  const accessToken = groupmeConfig.access_token;
+  const botId = groupmeConfig.bot_id;
+  return {
+    access_token: accessToken,
+    bot_id: botId,
+  };
+};
+
 module.exports = {
   handleRSVP: handleRSVP,
+  sendGameToGroup: sendGameToGroup,
 };

@@ -1,4 +1,6 @@
 const chai = require('chai');
+const groupme = require('groupme').Stateless;
+const groupmeConfig = require('../../config/groupme');
 const msgHandler = require('../../routes/message/handler');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
@@ -37,7 +39,7 @@ describe('Sample Unit Tests', function() {
     updatedGame.attendance.yes[0].should.equal('Dan');
   });
 
-  it('remove a player from the maybe array and add to the yes array', () => {
+  it('should remove player from the maybe array, add to the yes array', () => {
     const game = {
       attendance: {
         yes: [],
@@ -51,6 +53,26 @@ describe('Sample Unit Tests', function() {
     updatedGame.attendance.maybe.length.should.equal(1);
     updatedGame.attendance.no.length.should.equal(0);
     updatedGame.attendance.maybe[0].should.equal('Kayla');
+  });
+
+  it.only('should send game object to groupme', () => {
+    const game = {
+      time: '2019-06-20T20:00:00+00:00',
+      id: '1',
+      opponent: 'The Slapnut Magoos',
+      location: 'Kimbell Playground (Field A)',
+      attendance: {
+        yes: [],
+        no: [],
+        maybe: [],
+      },
+    };
+
+    const groupmeStub = sinon.stub(groupme.Bots, 'post');
+
+    msgHandler.sendGameToGroup(game);
+
+    groupmeStub.should.have.been.calledOnce;
   });
 
   // handling should be done in three parts
