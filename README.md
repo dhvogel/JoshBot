@@ -1,6 +1,6 @@
 # joshbot
 
-JoshBot is a bot which sits in a soccer team GroupMe and performs administrative tasks such as taking attendance and giving compliments.
+joshbot is a bot which sits in a soccer team GroupMe and performs administrative tasks such as taking attendance and giving compliments.
 
 ## Data Models
 
