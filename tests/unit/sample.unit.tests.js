@@ -26,17 +26,15 @@ describe('Sample Unit Tests', function() {
 
   it('should add a player name to the yes array', () => {
     const game = {
-      attendance: {
-        yes: [],
-        maybe: [],
-        no: [],
-      },
+      yes: [],
+      maybe: [],
+      no: [],
     };
 
     const updatedGame = msgHandler.addRSVP(game, 'Y', 'Kayla');
 
-    updatedGame.attendance.yes.length.should.equal(1);
-    updatedGame.attendance.yes[0].should.equal('Kayla');
+    updatedGame.yes.length.should.equal(1);
+    updatedGame.yes[0].should.equal('Kayla');
   });
 
   it('should send game object to groupme', () => {
@@ -45,11 +43,9 @@ describe('Sample Unit Tests', function() {
       id: '1',
       opponent: 'The Slapnut Magoos',
       location: 'Kimbell Playground (Field A)',
-      attendance: {
-        yes: [],
-        no: [],
-        maybe: [],
-      },
+      yes: [],
+      no: [],
+      maybe: [],
     };
 
     const groupmeStub = sinon.stub(groupme.Bots, 'post');

@@ -31,7 +31,7 @@ module.exports.msgHandler = async function(req, res, next) {
   }
 
   if (msg === 'Y' || msg === 'M' || msg === 'N') {
-    nextGame.attendance = removeRSVP(nextGame.attendance, name);
+    nextGame = removeRSVP(nextGame, name);
     const updatedNextGame = addRSVP(nextGame, msg, name);
     await datastore.save(updatedNextGame);
     res.sendStatus(204);
@@ -65,13 +65,13 @@ const sendGameToGroup = (game) => {
 const addRSVP = (game, msg, name) => {
   switch (msg) {
     case 'Y':
-      game.attendance.yes.push(name);
+      game.yes.push(name);
       break;
     case 'M':
-      game.attendance.maybe.push(name);
+      game.maybe.push(name);
       break;
     case 'N':
-      game.attendance.no.push(name);
+      game.no.push(name);
       break;
   }
   return game;
