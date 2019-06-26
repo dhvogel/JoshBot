@@ -3,7 +3,7 @@ const datastore = new Datastore();
 const groupme = require('groupme').Stateless;
 const groupmeConfig = require('../../config/groupme');
 
-module.exports.msgHandler = async function(req, res, next) {
+const msgHandler = async function(req, res, next) {
   if (!req.body.text) return;
 
   const msg = req.body.text.trim().toUpperCase();
@@ -108,5 +108,6 @@ const retrieveGroupmeCreds = () => {
 
 module.exports = {
   addRSVP: addRSVP,
+  msgHandler: msgHandler,
   sendGameToGroup: sendGameToGroup,
 };

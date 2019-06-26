@@ -40,7 +40,6 @@ describe('Sample Unit Tests', function() {
   it('should send game object to groupme', () => {
     const game = {
       time: '2019-06-20T20:00:00+00:00',
-      id: '1',
       opponent: 'The Slapnut Magoos',
       location: 'Kimbell Playground (Field A)',
       yes: [],
