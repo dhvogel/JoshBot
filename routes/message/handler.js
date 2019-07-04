@@ -1,5 +1,5 @@
 const {Datastore} = require('@google-cloud/datastore');
-const datastore = new Datastore();
+const datastore = new Datastore({projectId: 'joshbot'});
 const groupme = require('groupme').Stateless;
 const groupmeConfig = require('../../config/groupme');
 
@@ -21,7 +21,7 @@ const msgHandler = async function(req, res, next) {
       .order('time')
       .limit(1);
 
-  const [[nextGame]] = await datastore.runQuery(query);
+  let [[nextGame]] = await datastore.runQuery(query);
 
   const name = req.body.name;
 

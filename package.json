@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "nodemon ./bin/www",
     "lint": "node_modules/.bin/eslint **.js",
-    "prod": "GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/config/joshbot.json npm start",
+    "prod": "GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/config/joshbot.json GCLOUD_PROJECT=joshbot npm start",
     "start": "node ./bin/www",
     "test": "node_modules/.bin/nyc mocha --recursive tests/"
   },
