@@ -57,9 +57,16 @@ const msgHandler = async function(req, res, next) {
 
 const sendGameToGroup = (game) => {
   const groupmeCreds = retrieveGroupmeCreds();
+  const gameString =
+  `location: ${game.location}
+opponent: ${game.opponent}
+time: ${game.time}
+yes: ${game.yes.toString()}
+no: ${game.no.toString()}
+maybe: ${game.maybe.toString()}`;
   groupme.Bots.post(groupmeCreds.access_token,
       groupmeCreds.bot_id,
-      JSON.stringify(game, null, 4), {picture_url: null}, () => {});
+      gameString, {picture_url: null}, () => {});
 };
 
 const addRSVP = (game, msg, name) => {
