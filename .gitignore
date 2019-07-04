@@ -61,4 +61,4 @@ typings/
 .next
 
 # secrets
-config/
+secrets/

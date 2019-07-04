@@ -98,7 +98,7 @@ const removeRSVP = (att, n) => {
 };
 
 const retrieveGroupmeCreds = () => {
-  const accessToken = groupmeConfig.access_token;
+  const accessToken = process.env.GROUPME_ACCESS_TOKEN;
   const botId = groupmeConfig.bot_id;
   return {
     access_token: accessToken,
