@@ -3,6 +3,7 @@ const datastore = new Datastore({projectId: 'joshbot'});
 const groupme = require('groupme').Stateless;
 const groupmeConfig = require('../../config/groupme');
 const compliments = require('../../config/compliments');
+const capitalize = require('capitalize');
 
 const msgHandler = async function(req, res, next) {
   if (!req.body.text) return;
@@ -35,7 +36,6 @@ const msgHandler = async function(req, res, next) {
     nextGame = removeRSVP(nextGame, name);
     const updatedNextGame = addRSVP(nextGame, msg, name);
     await datastore.save(updatedNextGame);
-    res.sendStatus(204);
     return;
   }
 
@@ -44,6 +44,16 @@ const msgHandler = async function(req, res, next) {
 
   switch (cmd) {
     case 'JOSHBOT ADD':
+      if (parsedMsg.length < 3) {
+        postMessageToGroupMe('tell me who to add!');
+      } else if (parsedMsg.length > 6) {
+        return
+      }
+        else {
+        const nameToAdd = capitalize.words(parsedMsg.slice(2).join(' '));
+        const updatedNextGame = addRSVP(nextGame, 'Y', nameToAdd);
+        await datastore.save(updatedNextGame);
+      }
       break;
     case 'JOSHBOT COMPLIMENT':
     // default: give a compliment to the msg author
@@ -60,12 +70,42 @@ const msgHandler = async function(req, res, next) {
     case 'JOSHBOT KEEPERS':
     // yields an array of four random players who are RSVP'd yes to the next
     // game
+
       break;
     case 'JOSHBOT GAME':
     // yields game object
+      console.log(nextGame);
       sendGameToGroup(nextGame);
       break;
+    case 'JOSHBOT HELP':
+      const helpMsg = `joshbot add <name>
+    adds other player to next game
+
+joshbot compliment <name>
+    sends compliment to name
+
+joshbot game
+    displays details of next game
+
+joshbot help
+    shows joshbot commands
+
+joshbot remove
+    removes player from next game
+
+Y/M/N
+    RSVP self for next game
+`;
+      postMessageToGroupMe(helpMsg);
+      break;
     case 'JOSHBOT REMOVE':
+      if (parsedMsg.length < 3) {
+        postMessageToGroupMe('tell me who to remove!');
+      } else {
+        const nameToRemove = capitalize.words(parsedMsg.slice(2).join(' '));
+        const updatedNextGame = removeRSVP(nextGame, nameToRemove);
+        await datastore.save(updatedNextGame);
+      }
       break;
   }
 
@@ -73,7 +113,6 @@ const msgHandler = async function(req, res, next) {
 };
 
 const giveCompliment = (name) => {
-  console.log(`giving compliment to ${name}`);
   const complimentNum = getRandomInt(0, compliments.length - 1);
   const compliment = compliments[complimentNum];
   const complimentString = `${name}, ${compliment}`;
@@ -85,9 +124,9 @@ const sendGameToGroup = (game) => {
   `location: ${game.location}
 opponent: ${game.opponent}
 time: ${game.time}
-yes: ${game.yes.toString()}
-no: ${game.no.toString()}
-maybe: ${game.maybe.toString()}`;
+yes: ${game.yes.join(', ')}
+no: ${game.no.join(', ')}
+maybe: ${game.maybe.join(', ')}`;
   postMessageToGroupMe(gameString);
 };
 

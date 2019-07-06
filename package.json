@@ -5,10 +5,12 @@
   "scripts": {
     "dev": "env $(cat .env) nodemon ./bin/www",
     "lint": "node_modules/.bin/eslint **.js",
+    "preinstall": "rm -rf node_modules/*/.git",
     "start": "node -r dotenv/config ./bin/www",
     "test": "node_modules/.bin/nyc mocha --recursive tests/"
   },
   "dependencies": {
+    "capitalize": "2.0.0",
     "cookie-parser": "1.4.4",
     "debug": "2.6.9",
     "dotenv": "8.0.0",
