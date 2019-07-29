@@ -4,6 +4,7 @@ const groupme = require('groupme').Stateless;
 const groupmeConfig = require('../../config/groupme');
 const compliments = require('../../config/compliments');
 const capitalize = require('capitalize');
+const dateFormat = require('dateformat');
 
 const msgHandler = async function(req, res, next) {
   if (!req.body.text) return;
@@ -47,9 +48,8 @@ const msgHandler = async function(req, res, next) {
       if (parsedMsg.length < 3) {
         postMessageToGroupMe('tell me who to add!');
       } else if (parsedMsg.length > 6) {
-        return
-      }
-        else {
+        return;
+      } else {
         const nameToAdd = capitalize.words(parsedMsg.slice(2).join(' '));
         const updatedNextGame = addRSVP(nextGame, 'Y', nameToAdd);
         await datastore.save(updatedNextGame);
@@ -120,10 +120,11 @@ const giveCompliment = (name) => {
 };
 
 const sendGameToGroup = (game) => {
-  const gameString =
-  `location: ${game.location}
+  const time = Date.parse(game.time);
+  const formattedTime = dateFormat(time, 'm/d h:MM');
+  const gameString = `location: ${game.location}
 opponent: ${game.opponent}
-time: ${game.time}
+time: ${formattedTime}
 yes: ${game.yes.join(', ')}
 no: ${game.no.join(', ')}
 maybe: ${game.maybe.join(', ')}`;
