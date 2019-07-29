@@ -90,22 +90,22 @@ const msgHandler = async function(req, res, next) {
     case 'JOSHBOT HELP':
       logger.info('JOSHBOT HELP');
       const helpMsg = `joshbot add <name>
-    adds other player to next game
+    add player to next game
 
 joshbot compliment <name>
-    sends compliment to name
+    send compliment to name
 
 joshbot game
-    displays details of next game
+    display details of next game
 
 joshbot help
-    shows joshbot commands
+    show joshbot commands
 
 joshbot remove
-    removes player from next game
+    remove player from next game
 
 Y/M/N
-    RSVP self for next game
+    RSVP for next game
 `;
       postMessageToGroupMe(helpMsg);
       break;
