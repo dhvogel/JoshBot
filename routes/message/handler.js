@@ -1,10 +1,11 @@
 const {Datastore} = require('@google-cloud/datastore');
 const datastore = new Datastore({projectId: 'joshbot'});
 const groupme = require('groupme').Stateless;
-const groupmeConfig = require('../../config/groupme');
 const compliments = require('../../config/compliments');
 const capitalize = require('capitalize');
 const dateFormat = require('dateformat');
+
+let BOT_ID_OBJECT;
 
 const msgHandler = async function(req, res, next) {
   if (!req.body.text) return;
@@ -19,12 +20,12 @@ const msgHandler = async function(req, res, next) {
   const createdUnixTimestamp = req.body.created_at;
   const createdDate = new Date(createdUnixTimestamp*1000);
 
-  const query = datastore.createQuery('Game')
+  const gameQuery = datastore.createQuery('Game')
       .filter('time', '>', createdDate.toISOString())
       .order('time')
       .limit(1);
 
-  let [[nextGame]] = await datastore.runQuery(query);
+  let [[nextGame]] = await datastore.runQuery(gameQuery);
 
   const name = req.body.name;
 
@@ -42,6 +43,10 @@ const msgHandler = async function(req, res, next) {
 
   const parsedMsg = msg.split(' ');
   const cmd = `${parsedMsg[0]} ${parsedMsg[1]}`;
+
+  const botIDQuery = datastore.createQuery('BotID');
+
+  [[BOT_ID_OBJECT]] = await datastore.runQuery(botIDQuery);
 
   switch (cmd) {
     case 'JOSHBOT ADD':
@@ -120,6 +125,10 @@ const giveCompliment = (name) => {
 };
 
 const sendGameToGroup = (game) => {
+  if (!game) {
+    postMessageToGroupMe('next game not found :(');
+    return;
+  }
   const time = Date.parse(game.time);
   const formattedTime = dateFormat(time, 'm/d h:MM');
   const gameString = `location: ${game.location}
@@ -133,6 +142,7 @@ maybe: ${game.maybe.join(', ')}`;
 
 const postMessageToGroupMe = (msg) => {
   const groupmeCreds = retrieveGroupmeCreds();
+  console.log(`bot id: ${groupmeCreds.bot_id}`);
   groupme.Bots.post(groupmeCreds.access_token,
       groupmeCreds.bot_id,
       msg, {picture_url: null}, () => {});
@@ -175,7 +185,7 @@ const removeRSVP = (att, n) => {
 
 const retrieveGroupmeCreds = () => {
   const accessToken = process.env.GROUPME_ACCESS_TOKEN;
-  const botId = groupmeConfig.bot_id;
+  const botId = BOT_ID_OBJECT.bot_id;
   return {
     access_token: accessToken,
     bot_id: botId,
