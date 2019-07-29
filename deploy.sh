@@ -1,8 +1,8 @@
 gcloud beta run deploy joshbot \
-  --project ${PROJECT_ID} \
+  --project joshbot \
   --region us-central1 \
-  --image gcr.io/${PROJECT_ID}/joshbot:${VERSION} \
+  --image gcr.io/joshbot/joshbot:${VERSION} \
   --memory 1G \
   --concurrency 10 \
-  --set-env-vars "GROUPME_ACCESS_TOKEN=berglas://${BUCKET_ID}/groupme-at" \
+  --set-env-vars "GROUPME_ACCESS_TOKEN=berglas://joshbot-config/groupme-at" \
   --allow-unauthenticated
