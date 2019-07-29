@@ -5,6 +5,7 @@ const compliments = require('../../config/compliments');
 const capitalize = require('capitalize');
 const dateFormat = require('dateformat');
 const logger = require('../../util/logger').logger;
+require('@google-cloud/debug-agent').start();
 
 let BOT_ID_OBJECT;
 // 1 out of every 5 times joshbot gains sentience
@@ -66,9 +67,9 @@ const msgHandler = async function(req, res, next) {
     case 'JOSHBOT COMPLIMENT':
       logger.info('JOSHBOT COMPLIMENT');
       // default: give a compliment to the msg author
-      // optional: pass a name as a third argument, if passed, give the compliment
+      // optional: pass a name as a third argument, give the compliment
       // to the passed name.
-      // Note: for the bottom three, need to programatically post back to groupme
+      // Note: for bottom three, need to programatically post back to groupme
       if (parsedMsg.length === 3) {
         // eslint-disable-next-line
         giveCompliment(`${parsedMsg[2][0]}${parsedMsg[2].slice(1).toLowerCase()}`);
