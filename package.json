@@ -10,13 +10,15 @@
     "test": "node_modules/.bin/nyc mocha --recursive tests/"
   },
   "dependencies": {
+    "@google-cloud/datastore": "4.1.2",
+    "@google-cloud/logging-bunyan": "1.2.1",
+    "bunyan": "1.8.12",
     "capitalize": "2.0.0",
     "cookie-parser": "1.4.4",
     "dateformat": "3.0.3",
     "debug": "2.6.9",
     "dotenv": "8.0.0",
     "express": "4.16.1",
-    "@google-cloud/datastore": "4.1.2",
     "morgan": "1.9.1",
     "groupme": "0.5.8"
   },

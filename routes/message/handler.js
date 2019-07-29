@@ -4,8 +4,11 @@ const groupme = require('groupme').Stateless;
 const compliments = require('../../config/compliments');
 const capitalize = require('capitalize');
 const dateFormat = require('dateformat');
+const logger = require('../../util/logger').logger;
 
 let BOT_ID_OBJECT;
+// 1 out of every 5 times joshbot gains sentience
+// const SENTIENCE_GAIN_CHANCE = 0.2;
 
 const msgHandler = async function(req, res, next) {
   if (!req.body.text) return;
@@ -14,6 +17,7 @@ const msgHandler = async function(req, res, next) {
 
   if (!(msg.startsWith('JOSHBOT') ||
         msg === 'Y' || msg === 'M' || msg === 'N')) {
+    logger.info('message not a joshbot command or RSVP. Returning.');
     return;
   }
 
@@ -29,12 +33,8 @@ const msgHandler = async function(req, res, next) {
 
   const name = req.body.name;
 
-  if (!createdUnixTimestamp || !name) {
-    console.log('either createdUnixTimestamp or name not present');
-    return;
-  }
-
   if (msg === 'Y' || msg === 'M' || msg === 'N') {
+    logger.info(`RSVP received from ${name}`);
     nextGame = removeRSVP(nextGame, name);
     const updatedNextGame = addRSVP(nextGame, msg, name);
     await datastore.save(updatedNextGame);
@@ -50,21 +50,25 @@ const msgHandler = async function(req, res, next) {
 
   switch (cmd) {
     case 'JOSHBOT ADD':
+      logger.info('JOSHBOT ADD');
       if (parsedMsg.length < 3) {
+        logger.error(`no name to add`);
         postMessageToGroupMe('tell me who to add!');
       } else if (parsedMsg.length > 6) {
-        return;
+        logger.error(`name ${parsedMsg} too long to add`);
       } else {
+        logger.info(`adding ${parsedMsg} to game`);
         const nameToAdd = capitalize.words(parsedMsg.slice(2).join(' '));
         const updatedNextGame = addRSVP(nextGame, 'Y', nameToAdd);
         await datastore.save(updatedNextGame);
       }
       break;
     case 'JOSHBOT COMPLIMENT':
-    // default: give a compliment to the msg author
-    // optional: pass a name as a third argument, if passed, give the compliment
-    // to the passed name.
-    // Note: for the bottom three, need to programatically post back to groupme
+      logger.info('JOSHBOT COMPLIMENT');
+      // default: give a compliment to the msg author
+      // optional: pass a name as a third argument, if passed, give the compliment
+      // to the passed name.
+      // Note: for the bottom three, need to programatically post back to groupme
       if (parsedMsg.length === 3) {
         // eslint-disable-next-line
         giveCompliment(`${parsedMsg[2][0]}${parsedMsg[2].slice(1).toLowerCase()}`);
@@ -78,11 +82,12 @@ const msgHandler = async function(req, res, next) {
 
       break;
     case 'JOSHBOT GAME':
-    // yields game object
-      console.log(nextGame);
+      logger.info('JOSHBOT GAME');
+      // yields game object
       sendGameToGroup(nextGame);
       break;
     case 'JOSHBOT HELP':
+      logger.info('JOSHBOT HELP');
       const helpMsg = `joshbot add <name>
     adds other player to next game
 
@@ -104,6 +109,7 @@ Y/M/N
       postMessageToGroupMe(helpMsg);
       break;
     case 'JOSHBOT REMOVE':
+      logger.info('JOSHBOT REMOVE');
       if (parsedMsg.length < 3) {
         postMessageToGroupMe('tell me who to remove!');
       } else {
@@ -134,15 +140,14 @@ const sendGameToGroup = (game) => {
   const gameString = `location: ${game.location}
 opponent: ${game.opponent}
 time: ${formattedTime}
-yes: ${game.yes.join(', ')}
-no: ${game.no.join(', ')}
-maybe: ${game.maybe.join(', ')}`;
+yes (${game.yes.length}): ${game.yes.join(', ')}
+no (${game.no.length}): ${game.no.join(', ')}
+maybe (${game.maybe.length}): ${game.maybe.join(', ')}`;
   postMessageToGroupMe(gameString);
 };
 
 const postMessageToGroupMe = (msg) => {
   const groupmeCreds = retrieveGroupmeCreds();
-  console.log(`bot id: ${groupmeCreds.bot_id}`);
   groupme.Bots.post(groupmeCreds.access_token,
       groupmeCreds.bot_id,
       msg, {picture_url: null}, () => {});
